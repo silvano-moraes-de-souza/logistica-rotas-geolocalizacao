@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Dashboard Entrega",
+    "slug": "Dashboard-entrega",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Usado para escanear QR codes de saída/chegada e códigos de barras de pacotes",
+        "NSLocationWhenInUseUsageDescription": "Usado para registrar a localização das entregas",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Usado para geofencing e registro automático de entrada/saída"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0f172a",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store",
+      "expo-status-bar",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permita acesso à câmera para escanear QR codes"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Permita acesso à localização para registrar suas entregas",
+          "locationWhenInUsePermission": "Permita acesso à localização para registrar suas entregas"
+        }
+      ]
+    ]
+  }
+}
