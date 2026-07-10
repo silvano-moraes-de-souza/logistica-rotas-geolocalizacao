@@ -1,0 +1,13 @@
+#=============================================
+# PLANEJAMENTO DE ROTA
+# NOME: .gitignore
+# DESCRIÇÃO: Arquivo de configuração do Git para especificar arquivos e diretórios que devem ser ignorados
+# AUTOR: SILVANO MORAES DE SOUZA
+# VERSÃO: 1.0
+#=============================================
+node_modules/
+.env
+*.log
+/tmp/
+.DS_Store
+*.bat

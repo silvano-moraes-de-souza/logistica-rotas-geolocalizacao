@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<!--=============================================
+# PLANEJAMENTO DE ROTA
+# NOME: index.html
+# DESCRIÇÃO: Página principal da aplicação com interface para upload de arquivos, otimização de rotas e visualização de resultados
+# AUTOR: SILVANO MORAES DE SOUZA
+# VERSÃO: 1.0
+#=============================================-->
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <link rel="icon" href="https://api.iconify.design/material-symbols/local-shipping.svg?color=%2316a34a" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#003ec7",
+                        "on-primary": "#ffffff",
+                        "surface": "#fbf8ff",
+                        "surface-container": "#ededfb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#191b25",
+                        "outline": "#737688",
+                        "outline-variant": "#c3c5d9",
+                        "blue-100": "#dbeafe",
+                        "blue-800": "#1e40af",
+                        "green-600": "#16a34a",
+                        "green-700": "#15803d",
+                        "orange-600": "#ea580c",
+                        "purple-600": "#9333ea"
+                    },
+                    spacing: {
+                        "stack-md": "6px",
+                        "unit": "6px",
+                        "section-gap": "20px",
+                        "stack-sm": "3px",
+                        "gutter": "10px",
+                        "stack-lg": "10px",
+                        "container-margin": "16px"
+                    },
+                    fontSize: {
+                        "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+                        "h1": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "h2": ["28px", { lineHeight: "36px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "metric-xl": ["36px", { lineHeight: "44px", letterSpacing: "-0.03em", fontWeight: "800" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .kpi-gradient-blue {
+            background: linear-gradient(135deg, #0052ff 0%, #003ec7 100%);
+        }
+
+        .kpi-gradient-green {
+            background: linear-gradient(135deg, #00c853 0%, #009624 100%);
+        }
+
+        .kpi-gradient-purple {
+            background: linear-gradient(135deg, #6200ea 0%, #4a00b0 100%);
+        }
+
+        .kpi-gradient-orange {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF4500 100%);
+        }
+
+        .kpi-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-icon {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0.3;
+            font-size: 45px !important;
+            pointer-events: none;
+        }
+
+        .drag-over {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .wood-panel {
+            background-color: #8b5a2b;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+            border: 2px solid #5c3a21;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.2);
+            color: #f5deb3;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .draggable-row {
+            cursor: grab;
+        }
+
+        .draggable-row:active {
+            cursor: grabbing;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            background-color: #fef3c7 !important;
+        }
+        
+        .drag-over-row {
+            border-top: 2px solid #003ec7;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(2px);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #003ec7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col">
+    <header class="w-full px-container-margin py-3 bg-surface-container-lowest flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <img src="https://i.ibb.co/TxRDrPN2/logo-Dashboard.png" alt="Dashboard Logo" class="h-[60px] w-auto" />
+            <h1 class="text-[27px] font-bold text-on-surface tracking-tight">Planejamento de Rotas</h1>
+        </div>
+        <div class="wood-panel px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2" title="Consultas API consumidas hoje">
+            <span class="material-symbols-outlined text-[16px]">sync_alt</span>
+            <span>API: <span id="apiCounter">0</span> / 2000</span>
+        </div>
+    </header>
+
+    <main class="flex-grow px-container-margin pb-section-gap">
+        <!-- KPI Cards -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 mb-3">
+            <div
+                class="kpi-gradient-blue kpi-card p-2 rounded-lg shadow text-on-primary flex flex-col justify-between h-24 transform hover:scale-[1.02] transition-transform">
+                <div class="flex-grow flex flex-col justify-center">
+                    <span class="font-label-bold text-[10px] uppercase tracking-wider opacity-90">Custo de Combustível</span>
+                    <div class="font-bold text-lg mt-1" id="totalSavings">R$ 0,00</div>
+                </div>
+                <span class="material-symbols-outlined kpi-icon">savings</span>
+                <div class="flex items-center gap-1 text-[10px] relative z-10">
+                    <span>Estimado p/ rota atual (Gasolina)</span>
+                </div>
+            </div>
+            <div
+                class="kpi-gradient-green kpi-card p-2 rounded-lg shadow text-on-primary flex flex-col justify-between h-24 transform hover:scale-[1.02] transition-transform">
+                <div class="flex-grow flex flex-col justify-center">
+                    <span class="font-label-bold text-[10px] uppercase tracking-wider opacity-90">KM Total</span>
+                    <div class="font-bold text-lg mt-1" id="kmReduction">0 km</div>
+                </div>
+                <span class="material-symbols-outlined kpi-icon">distance</span>
+                <div class="flex items-center gap-1 text-[10px] relative z-10">
+                    <span>Distância total percorrida no dia</span>
+                </div>
+            </div>
+            <div
+                class="kpi-gradient-orange kpi-card p-2 rounded-lg shadow text-on-primary flex flex-col justify-between h-24 transform hover:scale-[1.02] transition-transform">
+                <div class="flex-grow flex flex-col justify-center">
+                    <span class="font-label-bold text-[10px] uppercase tracking-wider opacity-90">Capacidade</span>
+                    <div class="font-bold text-lg mt-1"><span id="totalWeight">0</span> / <span id="maxCapacity">650</span>kg</div>
+                </div>
+                <span class="material-symbols-outlined kpi-icon">weight</span>
+                <div class="flex items-center gap-2 relative z-10">
+                    <div class="flex-grow bg-white/20 h-2 rounded-full overflow-hidden">
+                        <div id="weightProgressBar" class="bg-white h-full" style="width: 0%"></div>
+                    </div>
+                    <span id="weightPercent" class="text-[10px] font-bold">0%</span>
+                </div>
+                <div class="flex items-center gap-1 text-[10px] relative z-10">
+                    <span>Capacidade de carga utilizada</span>
+                </div>
+            </div>
+            <div
+                class="kpi-gradient-purple kpi-card p-2 rounded-lg shadow text-on-primary flex flex-col justify-between h-24 transform hover:scale-[1.02] transition-transform">
+                <div class="flex-grow flex flex-col justify-center">
+                    <span class="font-label-bold text-[10px] uppercase tracking-wider opacity-90">Nível de Serviço</span>
+                    <div class="font-bold text-lg mt-1" id="serviceLevel">100%</div>
+                </div>
+                <span class="material-symbols-outlined kpi-icon">verified</span>
+                <div class="flex items-center gap-1 text-[10px] relative z-10 bg-white/20 px-2 py-0.5 rounded-full w-fit">
+                    <span id="totalStops">0</span> paradas / <span id="totalRoutes">0</span> rotas
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
+            <!-- Left Column: Upload -->
+            <aside class="lg:col-span-4 flex flex-col gap-3">
+                <div class="bg-white border border-outline-variant rounded-lg p-3 shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg"
+                            data-icon="cloud_upload">cloud_upload</span>
+                        <h2 class="font-semibold text-sm">Central de Upload</h2>
+                    </div>
+                    <div id="dropZone"
+                        class="border-2 border-dashed border-outline-variant rounded-lg p-4 flex flex-col items-center justify-center text-center hover:border-primary-container transition-colors cursor-pointer group">
+                        <div
+                            class="w-10 h-10 bg-surface-container rounded-full flex items-center justify-center mb-2 group-hover:bg-primary-fixed transition-colors">
+                            <span class="material-symbols-outlined text-primary text-xl">upload_file</span>
+                        </div>
+                        <p class="text-sm text-on-surface mb-1">Arraste arquivos PDF ou CSV</p>
+                        <p class="text-xs text-outline">ou clique para selecionar</p>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.csv" class="hidden">
+                    </div>
+                    <div id="fileList" class="mt-2 flex flex-col gap-1 max-h-32 overflow-y-auto"></div>
+
+                    <div class="mt-4 p-2 bg-blue-50 border border-blue-100 rounded-lg">
+                        <label class="text-[10px] font-bold uppercase text-blue-800 mb-1 block">Base de Saída
+                            (Origem)</label>
+                        <p class="text-[10px] text-blue-900 leading-tight">RUA EXEMPLO, 100,
+                            Sorocaba - SP</p>
+                    </div>
+
+
+                    <div class="mt-2 mb-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[10px] font-bold uppercase text-primary block">Quantos carros disponíveis?</label>
+                            <span id="fuelPriceDisplay" class="text-[9px] text-outline bg-surface-container px-2 py-0.5 rounded-full flex items-center gap-1">
+                                ⛽ Carregando preço...
+                            </span>
+                        </div>
+<select id="vehicleCountInput" onchange="updateCapacityDisplay()" class="w-full text-xs p-2 border border-primary/30 rounded-lg focus:ring-primary focus:border-primary bg-primary/5">
+<option value="1">1 Carro</option>
+<option value="2">2 Carros</option>
+<option value="3">3 Carros</option>
+<option value="4">4 Carros</option>
+<option value="5">5 Carros</option>
+<option value="truck_1">1 Caminhão</option>
+</select>
+                    </div>
+
+                    <button id="optimizeBtn"
+                        class="w-full mt-3 bg-primary text-on-primary text-sm font-bold py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container active:scale-95 transition-all shadow-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        disabled>
+                        <span class="material-symbols-outlined text-lg" data-icon="auto_fix_high">auto_fix_high</span>
+                        OTIMIZAR ROTAS
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Right Column: Results -->
+            <section class="lg:col-span-8">
+                <div class="bg-white border border-outline-variant rounded-lg shadow-sm overflow-hidden h-full">
+                    <div
+                        class="px-3 py-2 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-lg"
+                                data-icon="analytics">analytics</span>
+                            <h2 class="text-sm font-bold">Painel de Resultados</h2>
+                        </div>
+                        <div class="flex gap-1">
+                            <button id="exportBtn" class="p-1 hover:bg-surface-container rounded transition-colors"
+                                title="Exportar CSV">
+                                <span class="material-symbols-outlined text-outline text-lg"
+                                    data-icon="download">download</span>
+                            </button>
+                            <button id="openFullRouteBtn"
+                                class="p-1 hover:bg-surface-container rounded transition-colors" title="Abrir no Maps">
+                                <span class="material-symbols-outlined text-outline text-lg" data-icon="map">map</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="geocodingAlert"
+                        class="hidden px-3 py-2 bg-red-50 border-b border-red-100 flex items-center gap-2 text-red-700">
+                        <span class="material-symbols-outlined text-sm">warning</span>
+                        <span class="text-[10px] font-semibold"><span id="invalidCount">0</span> endereços não
+                            localizados e excluídos da rota.</span>
+                    </div>
+
+                    <div id="emptyState" class="text-center py-6">
+                        <p class="text-sm text-gray-500">Faca upload e clique em "OTIMIZAR ROTAS"</p>
+                    </div>
+                    <div id="resultsContainer" class="hidden fade-in overflow-x-auto">
+                        <div id="dayFilters" class="flex gap-1 p-2 border-b border-outline-variant overflow-x-auto">
+                        </div>
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-surface-container/50 border-b border-outline-variant">
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-center">
+                                        Parada</th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider">Endereco</th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-center">
+                                        Historico</th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-center">
+                                        Data</th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-center">
+                                        Chegada</th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-center">
+                                        Saida</th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-right">
+                                        Viagem</th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-right">KM
+                                    </th>
+                                    <th class="px-2 py-2 font-bold text-outline uppercase tracking-wider text-center">
+                                        Maps</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody" class="divide-y divide-outline-variant/30"></tbody>
+                        </table>
+                    </div>
+                    <div id="resultsFooter"
+                        class="hidden px-3 py-2 bg-surface-container/20 border-t border-outline-variant flex justify-between items-center text-xs">
+                        <span id="resultsCount" class="text-outline"></span>
+                        <div class="flex gap-1">
+                            <button id="prevPage"
+                                class="px-2 py-1 border border-outline-variant rounded text-xs font-semibold hover:bg-surface-container transition-colors">Anterior</button>
+                            <button id="nextPage"
+                                class="px-2 py-1 bg-primary text-on-primary rounded text-xs font-semibold hover:bg-primary-container transition-colors">Proximo</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer
+        class="w-full border-t border-outline-variant py-stack-lg px-container-margin bg-white flex justify-between items-center">
+        <p class="font-body-sm text-outline">&copy; 2026 Dashboard Financeiro BI - Sistema de Planejamento de Rotas</p>
+        <p class="font-body-sm text-outline">Desenvolvido por: Silvano Moraes de Souza</p>
+    </footer>
+
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="text-sm font-bold text-primary mt-4">Otimizando sua logística...</p>
+        <p class="text-[10px] text-outline">Geocodificando endereços e calculando rotas</p>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const CONFIG = {
+            BASE_ADDRESS: "RUA EXEMPLO, 100, Sorocaba - SP",
+            SOROCABA: "Sorocaba, SP",
+            AVERAGE_SPEED_KMH: 60,
+            STOP_TIME_MINUTES: 10,
+            GAS_COST_PER_KM: 0.60,
+            DAILY_START_HOUR: 8,
+            DAILY_END_HOUR: 16,
+            DAILY_LIMIT_MINUTES: (16 - 8) * 60,
+            HOURLY_OVERTIME_RATE: 50.00
+        };
+
+        let uploadedFiles = [];
+        let optimizedRoutes = [];
+        let currentPage = 1;
+        let selectedVehicle = null;
+        let currentFuelPrice = 6.14;
+        const ITEMS_PER_PAGE = 10;
+
+        let apiRequestCount = parseInt(localStorage.getItem('apiCount_' + new Date().toLocaleDateString('pt-BR'))) || 0;
+let draggedStopInfo = null;
+
+function getMaxCapacity() {
+  const val = document.getElementById('vehicleCountInput').value;
+  if (val.startsWith('truck_')) {
+    const count = parseInt(val.split('_')[1]);
+    return count * 2500;
+  }
+  return parseInt(val) * 650;
+}
+
+function updateCapacityDisplay() {
+  const maxCap = getMaxCapacity();
+  const maxCapEl = document.getElementById('maxCapacity');
+  if (maxCapEl) maxCapEl.textContent = maxCap.toLocaleString('pt-BR');
+  const weightEl = document.getElementById('totalWeight');
+  const weightBar = document.getElementById('weightProgressBar');
+  const weightPercentEl = document.getElementById('weightPercent');
+  const totalWeight = weightEl ? parseInt(weightEl.textContent) || 0 : 0;
+  if (weightBar) {
+    const percent = maxCap > 0 ? Math.min(100, (totalWeight / maxCap) * 100) : 0;
+    weightBar.style.width = percent + '%';
+    weightBar.className = percent > 90 ? 'bg-red-500 h-full' : 'bg-white h-full';
+    if (weightPercentEl) weightPercentEl.textContent = Math.round(percent) + '%';
+  }
+}
+
+function updateApiCounterDisplay() {
+            const el = document.getElementById('apiCounter');
+            if (el) el.textContent = apiRequestCount;
+        }
+        function incrementApiCounter() {
+            apiRequestCount++;
+            localStorage.setItem('apiCount_' + new Date().toLocaleDateString('pt-BR'), apiRequestCount);
+            updateApiCounterDisplay();
+        }
+        document.addEventListener('DOMContentLoaded', updateApiCounterDisplay);
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const optimizeBtn = document.getElementById('optimizeBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const emptyState = document.getElementById('emptyState');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsBody = document.getElementById('resultsBody');
+        const resultsFooter = document.getElementById('resultsFooter');
+        const resultsCount = document.getElementById('resultsCount');
+        const dayFilters = document.getElementById('dayFilters');
+        const exportBtn = document.getElementById('exportBtn');
+        const openFullRouteBtn = document.getElementById('openFullRouteBtn');
+        const totalSavingsEl = document.getElementById('totalSavings');
+        const kmReductionEl = document.getElementById('kmReduction');
+        const overtimeSavedEl = document.getElementById('overtimeSaved');
+        const totalStopsEl = document.getElementById('totalStops');
+        const totalRoutesEl = document.getElementById('totalRoutes');
+
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // Preço do combustível
+        function initFuelPrice() {
+            const display = document.getElementById('fuelPriceDisplay');
+            if (display) {
+                display.innerHTML = `⛽ Gasolina (Sorocaba): R$ ${currentFuelPrice.toFixed(2).replace('.', ',')}`;
+            }
+        }
+        initFuelPrice();
+
+        function handleFiles(files) {
+            const validFiles = Array.from(files).filter(f =>
+                f.type === 'application/pdf' || f.type === 'text/csv' ||
+                f.name.endsWith('.pdf') || f.name.endsWith('.csv')
+            );
+            uploadedFiles = uploadedFiles.concat(validFiles).slice(0, 100);
+            updateFileList();
+            optimizeBtn.disabled = uploadedFiles.length === 0;
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = uploadedFiles.map((f, i) => `
+                <div class="flex items-center justify-between p-1 bg-surface-container rounded border border-outline-variant/30">
+                    <div class="flex items-center gap-1 overflow-hidden">
+                        <span class="material-symbols-outlined text-sm ${f.name.endsWith('.pdf') ? 'text-secondary' : 'text-primary'}">${f.name.endsWith('.pdf') ? 'picture_as_pdf' : 'description'}</span>
+                        <span class="font-body-sm font-semibold truncate">${f.name}</span>
+                    </div>
+                    <button onclick="removeFile(${i})" class="text-error hover:text-error-container">
+                        <span class="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            updateFileList();
+            optimizeBtn.disabled = uploadedFiles.length === 0;
+        }
+
+        async function extractTextFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                fullText += content.items.map(item => item.str).join(' ') + '\n';
+            }
+            return fullText.replace(/\r/g, '\n');
+        }
+
+        function extractAddressFromPDFText(text) {
+            const nfMatch = text.match(/NF-e\s*Nº\s*([\d\.]+)/i);
+            const nfNumber = nfMatch ? nfMatch[1] : 'NF-e';
+
+            const startMatch = text.search(/DESTINATÁRIO\s*\/\s*REMETENTE|DESTINATARIO/i);
+            let blockText = '';
+            if (startMatch !== -1) {
+                const tempText = text.substring(startMatch);
+                const endMatch = tempText.search(/FATURA|CÁLCULO\s*DO\s*IMPOSTO|CALCULO\s*DO\s*IMPOSTO/i);
+                blockText = endMatch !== -1 ? tempText.substring(0, endMatch) : tempText.substring(0, 1500);
+            } else {
+                blockText = text.substring(0, 2000);
+            }
+            const cleanBlock = blockText.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+
+            const addrMatch = cleanBlock.match(/ENDEREÇO[:\s]+(.*?)(?=BAIRRO|CEP|MUNICÍPIO|MUNICIPIO|FONE|$)/i);
+            let logradouro = addrMatch ? addrMatch[1].trim() : '';
+
+            const bairroMatch = cleanBlock.match(/BAIRRO[:\s]+(.*?)(?=CEP|MUNICÍPIO|MUNICIPIO|FONE|$)/i);
+            let bairro = bairroMatch ? bairroMatch[1].trim() : '';
+
+            const munMatch = cleanBlock.match(/MUNICÍPIO[:\s]+(.*?)(?=UF|FONE|TELEFONE|$)/i) || cleanBlock.match(/MUNICIPIO[:\s]+(.*?)(?=UF|FONE|TELEFONE|$)/i);
+            let municipio = munMatch ? munMatch[1].trim() : '';
+
+            const ufMatch = cleanBlock.match(/UF[:\s]+([A-Z]{2})/i);
+            let uf = ufMatch ? ufMatch[1].toUpperCase() : 'SP';
+
+            const cepMatch = cleanBlock.match(/CEP[:\s]+(\d{5}[-\s]?\d{3})/i);
+            let cep = cepMatch ? cepMatch[1].replace(/\s/g, '-') : '';
+
+            municipio = municipio.split(/\s*(?:FONE|TELEFONE|FAX|FO)\b/i)[0].trim();
+            municipio = municipio.replace(/FO,\s*NE/gi, '').replace(/[,.-]+$/, '').trim();
+            if (municipio.toUpperCase().includes('PONTA GROSSA')) uf = 'PR';
+
+            let gpsAddress = logradouro;
+            gpsAddress = gpsAddress.replace(/\s*-\s*(?:SALA|APTO|BLOCO|S\/|CJ).*$/i, '');
+            gpsAddress = gpsAddress.replace(/\b(?:SALA|APTO|BLOCO|CONJUNTO|CJ)\s+\d+.*$/i, '');
+
+            const transportIndex = text.toUpperCase().indexOf("TRANSPORTADOR");
+            const transportArea = transportIndex !== -1 ? text.substring(transportIndex, transportIndex + 1500) : text;
+            const qtyMatch = transportArea.match(/QUANTIDADE\s*([\d\.]+)/i);
+            const volume = qtyMatch ? parseInt(qtyMatch[1].replace(/\./g, '')) : 1;
+            const weightMatch = transportArea.match(/PESO\s*BRUTO\s*([\d\.,]+)/i);
+            let weight = 10;
+            if (weightMatch) {
+                const rw = weightMatch[1];
+                weight = parseFloat(rw.includes(',') && rw.includes('.') ? rw.replace(/\./g, '').replace(',', '.') : rw.replace(',', '.'));
+            }
+
+            const searchAddress = `${gpsAddress}, ${bairro}, ${municipio} - ${uf}, Brasil`;
+
+            if (!logradouro) return null;
+
+            return { address: gpsAddress, fullAddress: searchAddress, city: municipio, uf, cep, nf: nfNumber, weight, volume, bairro };
+        }
+
+        function parseCSVContent(text) {
+            const lines = text.split(/\r?\n/).filter(l => l.trim());
+            if (lines.length === 0) return [];
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const addresses = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cells = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                const row = {};
+                headers.forEach((h, idx) => row[h] = cells[idx]);
+                const addressFields = ['endereco', 'endereço', 'address', 'logradouro', 'rua', 'local', 'destination', 'destino', 'cliente_endereco', 'entrega'];
+                let address = '';
+                for (const field of addressFields) {
+                    const found = Object.keys(row).find(k => k.includes(field));
+                    if (found && row[found]) { address = row[found]; break; }
+                }
+                if (address) {
+                    addresses.push({ address: address.trim(), nf: row['nf'] || row['nota'] || row['documento'] || 'CSV', weight: parseFloat(row['peso']) || 10 });
+                }
+            }
+            return addresses;
+        }
+
+        async function processUploadedFiles(files) {
+            const allAddresses = [];
+            for (const file of files) {
+                const text = await file.text();
+                if (file.name.endsWith('.pdf')) {
+                    const pdfText = await extractTextFromPDF(file);
+                    const result = extractAddressFromPDFText(pdfText);
+                    if (result) allAddresses.push(result);
+                } else if (file.name.endsWith('.csv')) {
+                    const rows = parseCSVContent(text);
+                    allAddresses.push(...rows);
+                }
+            }
+            return allAddresses;
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function optimizeStopOrder(baseCoords, stops) {
+            if (stops.length <= 1) return [...stops];
+            const ordered = [];
+            const remaining = stops.map(s => ({ ...s }));
+            let current = { ...baseCoords };
+            while (remaining.length > 0) {
+                let nearestIdx = 0, nearestDist = Infinity;
+                for (let i = 0; i < remaining.length; i++) {
+                    const dist = haversine(current.lat, current.lon, remaining[i].lat, remaining[i].lon);
+                    if (dist < nearestDist) { nearestDist = dist; nearestIdx = i; }
+                }
+                ordered.push(remaining[nearestIdx]);
+                current = remaining[nearestIdx];
+                remaining.splice(nearestIdx, 1);
+            }
+            return ordered;
+        }
+
+        function buildVehicleRoute(base, orderedStops, startDate) {
+            const dayStops = [];
+            let routeKm = 0;
+            let currentDate = new Date(startDate);
+
+            orderedStops.forEach((stop, i) => {
+                const prev = i === 0 ? base : orderedStops[i - 1];
+                const dist = haversine(prev.lat, prev.lon, stop.lat, stop.lon);
+                const travelMinutes = Math.round((dist / CONFIG.AVERAGE_SPEED_KMH) * 60);
+                const arrival = new Date(currentDate.getTime() + (travelMinutes * 60 * 1000));
+                const departure = new Date(arrival.getTime() + (CONFIG.STOP_TIME_MINUTES * 60 * 1000));
+                currentDate = departure;
+                routeKm += dist;
+                dayStops.push({
+                    parada: i + 1,
+                    address: stop.address,
+                    arrival: arrival.toISOString(),
+                    departure: departure.toISOString(),
+                    travelTime: travelMinutes,
+                    km: parseFloat(dist.toFixed(1)),
+                    date: startDate.toLocaleDateString('pt-BR'),
+                    tipo: 'entrega',
+                    nf: stop.nf || 'N/A',
+                    weight: stop.weight || 10,
+                    volume: stop.volume || 1
+                });
+            });
+
+            if (orderedStops.length > 0) {
+                const last = orderedStops[orderedStops.length - 1];
+                const returnDist = haversine(last.lat, last.lon, base.lat, base.lon);
+                const returnMinutes = Math.round((returnDist / CONFIG.AVERAGE_SPEED_KMH) * 60);
+                const returnArrival = new Date(currentDate.getTime() + (returnMinutes * 60 * 1000));
+                routeKm += returnDist;
+                dayStops.push({
+                    parada: 'R',
+                    address: CONFIG.BASE_ADDRESS,
+                    arrival: returnArrival.toISOString(),
+                    departure: returnArrival.toISOString(),
+                    travelTime: returnMinutes,
+                    km: parseFloat(returnDist.toFixed(1)),
+                    date: startDate.toLocaleDateString('pt-BR'),
+                    tipo: 'retorno_base',
+                    nf: '—',
+                    weight: 0,
+                    volume: 0
+                });
+            }
+
+            return { stops: dayStops, totalKm: Math.round(routeKm * 10) / 10 };
+        }
+
+        function buildRoutesForVehicles(addresses, vehicleCount) {
+            const baseCoords = { lat: -23.5015, lon: -47.4526 };
+            const addressesWithCoords = addresses.map(a => ({
+                ...a,
+                lat: baseCoords.lat + (Math.random() - 0.5) * 0.1,
+                lon: baseCoords.lon + (Math.random() - 0.5) * 0.1
+            }));
+
+            const perVehicle = Math.ceil(addressesWithCoords.length / vehicleCount);
+            const routes = [];
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() + 1);
+            startDate.setHours(CONFIG.DAILY_START_HOUR, 0, 0, 0);
+
+            for (let v = 0; v < vehicleCount; v++) {
+                const vehicleStops = addressesWithCoords.slice(v * perVehicle, (v + 1) * perVehicle);
+                if (vehicleStops.length === 0) continue;
+                const ordered = optimizeStopOrder(baseCoords, vehicleStops);
+                const route = buildVehicleRoute(baseCoords, ordered, startDate);
+                routes.push({ day: 1, vehicleId: v + 1, stops: route.stops, totalKm: route.totalKm });
+            }
+            return routes;
+        }
+
+        function formatTime(val) {
+            if (!val) return '00:00';
+            if (typeof val === 'string' && val.includes('T')) {
+                const d = new Date(val);
+                return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            }
+            const h = Math.floor(val / 60) % 24; 
+            const m = Math.round(val % 60);
+            return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+        }
+
+        function formatDuration(minutes) {
+            if (!minutes || minutes === 0) return '0 min';
+            const h = Math.floor(minutes / 60);
+            const m = Math.round(minutes % 60);
+            if (h > 0) {
+                return `${h}h${m > 0 ? ' ' + m + 'min' : ''}`;
+            }
+            return `${m} min`;
+        }
+
+        function getMapsUrl(stop) {
+            const addr = stop.address || '';
+            const cep = stop.cep || '';
+            const query = (cep ? cep + ', ' : '') + addr;
+            return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+        }
+
+        function getFullRouteUrl(route) {
+            const stops = route.stops.filter(s => s.tipo !== 'retorno_base');
+            if (stops.length === 0) return '#';
+            const waypoints = stops
+                .map(s => encodeURIComponent(s.address || ''))
+                .join('|');
+            const origin = encodeURIComponent(CONFIG.BASE_ADDRESS);
+            return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${origin}&travelmode=driving&waypoints=${waypoints}`;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            toast.style.backgroundColor = type === 'success' ? '#16a34a' : '#dc2626';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        optimizeBtn.addEventListener('click', async function () {
+            loadingOverlay.style.display = 'flex';
+            optimizeBtn.disabled = true;
+            emptyState.classList.add('hidden');
+
+            try {
+                if (uploadedFiles.length === 0) throw new Error('Selecione ao menos um arquivo (PDF ou CSV)');
+
+                const addresses = await processUploadedFiles(uploadedFiles);
+                if (addresses.length === 0) throw new Error('Nenhum endereço encontrado nos arquivos');
+
+                const vehicleCount = document.getElementById('vehicleCountInput').value;
+                const vehicleNumber = vehicleCount.startsWith('truck_') ? parseInt(vehicleCount.split('_')[1]) : parseInt(vehicleCount);
+
+                optimizedRoutes = buildRoutesForVehicles(addresses, vehicleNumber);
+
+                const totalKm = optimizedRoutes.reduce((s, r) => s + r.totalKm, 0);
+                const totalStops = optimizedRoutes.reduce((s, r) => s + r.stops.length, 0);
+                const fuelCost = (totalKm / 10) * currentFuelPrice;
+
+                updateDashboard(optimizedRoutes, {
+                    totalKm,
+                    fuelCost,
+                    totalSavings: fuelCost,
+                    kmSaved: totalKm,
+                    totalStops,
+                    totalRoutes: optimizedRoutes.length
+                });
+
+                showToast('Rotas otimizadas com sucesso!');
+
+                resultsContainer.classList.remove('hidden');
+                resultsFooter.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast(error.message, 'error');
+                emptyState.classList.remove('hidden');
+            } finally {
+                loadingOverlay.style.display = 'none';
+                optimizeBtn.disabled = false;
+            }
+        });
+
+        function updateDashboard(routes, summary) {
+            console.log('[Dashboard] Atualizando com resumo:', summary);
+            
+            // Custo de Combustível
+            let fuelCost = summary.fuelCost || summary.totalSavings || 0;
+            // Fallback: se estiver zerado mas temos rotas, calcular KM * Preço / 10
+            const totalKmFromRoutes = routes.reduce((sum, r) => sum + (r.totalKm || 0), 0);
+            const totalKm = summary.totalKm || summary.distance || summary.kmSaved || totalKmFromRoutes;
+            
+            if (fuelCost === 0 && totalKm > 0) {
+                fuelCost = (totalKm / 10) * currentFuelPrice;
+            }
+
+            if (totalSavingsEl) totalSavingsEl.textContent = 'R$ ' + fuelCost.toFixed(2).replace('.', ',');
+            if (kmReductionEl) kmReductionEl.textContent = totalKm.toFixed(1).replace('.', ',') + ' km';
+
+            // Cálculo de Volume/Peso
+            const totalWeight = routes.reduce((sum, r) => sum + r.stops.reduce((s, st) => s + (st.weight || 0), 0), 0);
+            const weightEl = document.getElementById('totalWeight');
+            const weightBar = document.getElementById('weightProgressBar');
+            const weightPercentEl = document.getElementById('weightPercent');
+            
+if (weightEl) weightEl.textContent = Math.round(totalWeight);
+if (weightBar) {
+const maxCapacity = getMaxCapacity();
+const percent = maxCapacity > 0 ? Math.min(100, (totalWeight / maxCapacity) * 100) : 0;
+                weightBar.style.width = percent + '%';
+                weightBar.className = percent > 90 ? 'bg-red-500 h-full' : 'bg-white h-full';
+                if (weightPercentEl) weightPercentEl.textContent = Math.round(percent) + '%';
+            }
+
+            // Nível de Serviço
+            const allStops = routes.flatMap(r => r.stops);
+            const serviceLevelEl = document.getElementById('serviceLevel');
+            const serviceLevelSub = document.getElementById('serviceLevelSub');
+            
+            if (serviceLevelEl) serviceLevelEl.textContent = '100%';
+            if (serviceLevelSub && summary.totalDurationFormatted) {
+                serviceLevelSub.innerHTML = `<span class="font-bold">${summary.totalDurationFormatted}</span> totais | ${routes.length} veículos`;
+            } else {
+                if (totalStopsEl) totalStopsEl.textContent = allStops.length;
+                if (totalRoutesEl) totalRoutesEl.textContent = routes.length;
+            }
+
+            currentPage = 1;
+            selectedVehicle = null;
+            renderFilters();
+            renderResults();
+        }
+
+        function renderFilters() {
+            if (!dayFilters) return;
+
+            let totalStopsAll = optimizedRoutes.reduce((s, r) => s + r.stops.length, 0);
+            const vCount = document.getElementById('vehicleCountInput').value;
+            const isTruck = vCount.startsWith('truck_');
+            const label = isTruck ? 'CAMINHÃO' : 'CARRO';
+
+            let buttonsHtml = '<button onclick="filterByVehicle(null)" class="px-2 py-1 rounded text-xs font-bold ' +
+                (selectedVehicle === null ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface') +
+                '">Todos (' + totalStopsAll + ')</button>';
+
+            for (let i = 0; i < optimizedRoutes.length; i++) {
+                const r = optimizedRoutes[i];
+                buttonsHtml += '<button onclick="filterByVehicle(' + r.vehicleId + ')" class="px-2 py-1 rounded text-xs font-bold ' +
+                    (selectedVehicle === r.vehicleId ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface') +
+                    '">' + label + ' ' + r.vehicleId + ' (' + r.stops.length + ')</button>';
+            }
+
+            buttonsHtml += '<button id="shareRouteBtn" class="ml-auto px-2 py-1 rounded text-xs font-bold bg-green-600 text-white hover:bg-green-700 flex items-center gap-1">' +
+                '<span class="material-symbols-outlined text-[14px]">share</span>Enviar Link</button>';
+
+            dayFilters.innerHTML = buttonsHtml;
+
+            document.getElementById('shareRouteBtn').addEventListener('click', shareVehicleLink);
+        }
+
+        window.filterByVehicle = function (vehicleId) {
+            selectedVehicle = vehicleId;
+            currentPage = 1;
+            renderFilters();
+            renderResults();
+        };
+
+        window.shareVehicleLink = function () {
+            const targetId = selectedVehicle || 1;
+            const route = optimizedRoutes.find(r => r.vehicleId === targetId);
+            if (!route) return;
+
+            const stops = route.stops.filter(s => s.tipo !== 'retorno_base');
+            const waypoints = stops
+                .map(s => encodeURIComponent(s.address))
+                .join('|');
+            const origin = encodeURIComponent(CONFIG.BASE_ADDRESS);
+            const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${origin}&travelmode=driving&waypoints=${waypoints}`;
+
+            const vCount = document.getElementById('vehicleCountInput').value;
+            const isTruck = vCount.startsWith('truck_');
+            const label = isTruck ? 'CAMINHÃO' : 'CARRO';
+
+            if (navigator.share) {
+                navigator.share({ title: 'Rota ' + label + ' ' + targetId, url: url });
+            } else {
+                prompt('Copie o link para enviar ao motorista:', url);
+            }
+        };
+
+        function renderResults() {
+            let stopsToShow = [];
+            if (selectedVehicle) {
+                const filteredRoutes = optimizedRoutes.filter(r => r.vehicleId === selectedVehicle);
+                stopsToShow = filteredRoutes.flatMap(r => {
+                    return r.stops
+                        .filter(s => s.tipo === 'entrega')
+                        .map(s => Object.assign({}, s, { day: r.day, vehicleId: r.vehicleId }));
+                });
+            } else {
+                stopsToShow = optimizedRoutes.flatMap(r => {
+                    return r.stops
+                        .filter(s => s.tipo === 'entrega')
+                        .map(s => Object.assign({}, s, { day: r.day, vehicleId: r.vehicleId }));
+                });
+            }
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const pageStops = stopsToShow.slice(start, end);
+
+            // Agrupar por Veículo para exibição
+            let html = '';
+            let currentVehicle = null;
+
+            pageStops.forEach(stop => {
+                if (stop.vehicleId !== currentVehicle) {
+                    currentVehicle = stop.vehicleId;
+                    const vehicleLabel = (document.getElementById('vehicleCountInput').value.startsWith('truck_')) ? 'CAMINHÃO' : 'CARRO';
+                    const route = optimizedRoutes.find(r => r.vehicleId === currentVehicle);
+                    const deliveryStops = route ? route.stops.filter(s => s.tipo === 'entrega') : [];
+                    const mapsUrl = deliveryStops.length > 0 ? getFullRouteUrl(route) : '#';
+html += `<tr class="bg-primary/5 font-bold"><td colspan="9" class="px-2 py-2 text-primary border-y border-primary/10 text-[10px]"><span class="flex items-center gap-2">${vehicleLabel} ${currentVehicle} (${deliveryStops.length} paradas${route ? ', ' + route.totalKm.toFixed(1) + ' km' : ''})${mapsUrl !== '#' ? `<button onclick="window.open('${mapsUrl.replace(/'/g, "\\'")}')" class="ml-1 p-0.5 hover:bg-primary/10 rounded" title="Abrir rota no Maps"><span class="material-symbols-outlined text-sm">map</span></button>` : ''}</span></td></tr>`;
+                }
+
+                const address = stop.address || '';
+                const parts = address.split(',').map(p => p.trim());
+                const rua = parts[0] || '';
+                const cidadeEstado = parts.slice(1).join(', ') || '';
+                
+                const km = stop.km || 0;
+                const time = stop.travelTime || 0;
+
+                // Ensure stop.parada is just a number for tracking or use index
+                const stopIndex = stop.parada;
+
+                html += `<tr class="hover:bg-primary-fixed/10 transition-colors text-xs draggable-row" draggable="true"
+                    ondragstart="dragStart(event, ${stop.day}, ${stop.vehicleId}, '${stopIndex}')"
+                    ondragover="dragOver(event)"
+                    ondragenter="dragEnter(event)"
+                    ondragleave="dragLeave(event)"
+                    ondrop="drop(event, ${stop.day}, ${stop.vehicleId}, '${stopIndex}')"
+                    ondragend="dragEnd(event)">` +
+                    '<td class="px-2 py-1 text-center"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">P' + stop.parada + ' (D' + stop.day + ')</span></td>' +
+                    '<td class="px-2 py-1"><div class="font-bold text-xs">' + rua + '</div><div class="text-[10px] text-outline">' + cidadeEstado + '</div></td>' +
+                    '<td class="px-2 py-1 text-center text-xs font-bold text-primary">' + (stop.nf || 'N/A') + '</td>' +
+                    '<td class="px-2 py-1 text-center text-xs">' + stop.date + '</td>' +
+                    '<td class="px-2 py-1 text-center text-xs">' + formatTime(stop.arrival) + '</td>' +
+                    `<td class="px-2 py-1 text-center text-xs cursor-pointer text-primary underline decoration-dotted" onclick="editDepartureTime(event, ${stop.day}, ${stop.vehicleId}, '${stopIndex}')" title="Clique para alterar o tempo de parada">` + formatTime(stop.departure) + '</td>' +
+                    '<td class="px-2 py-1 text-right text-xs font-medium">' + formatDuration(time) + '</td>' +
+                    '<td class="px-2 py-1 text-right text-xs font-bold">' + km.toFixed(1) + ' km</td>' +
+                    '<td class="px-2 py-1 text-center"><button onclick="window.open(\'' + getMapsUrl(stop) + '\')" class="p-0.5 hover:bg-surface-container rounded"><span class="material-symbols-outlined text-sm text-primary">location_on</span></button></td>' +
+                    '</tr>';
+            });
+
+            resultsBody.innerHTML = html;
+
+            const totalStops = stopsToShow.length;
+            resultsCount.textContent = totalStops > 0 ?
+                'Mostrando ' + (start + 1) + '-' + Math.min(end, totalStops) + ' de ' + totalStops + ' paradas' :
+                'Nenhuma parada para exibir';
+        }
+
+        exportBtn.addEventListener('click', function () {
+            const allStops = optimizedRoutes.flatMap(r => {
+                return r.stops
+                    .filter(s => s.tipo !== 'retorno_base')
+                    .map(s => Object.assign({}, s, { day: r.day }));
+            });
+            let csv = 'Dia,Parada,Endereco,Historico,Data,Chegada,Saida,Tempo Viagem (min),KM\n';
+            allStops.forEach(s => {
+                csv += s.day + ',' + s.parada + ',"' + (s.address || '') + '",' + (s.nf || '') + ',' + s.date + ',' + formatTime(s.arrival) + ',' + formatTime(s.departure) + ',"' + formatDuration(s.travelTime) + '",' + s.km + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'rota_otimizada_' + new Date().toLocaleDateString('pt-BR').replace(/\//g, '-') + '.csv';
+            link.click();
+        });
+
+        openFullRouteBtn.addEventListener('click', function () {
+            if (optimizedRoutes.length > 0) {
+                window.open(getFullRouteUrl(optimizedRoutes[0]));
+            }
+        });
+
+        document.getElementById('prevPage').addEventListener('click', function () {
+            if (currentPage > 1) { currentPage--; renderResults(); }
+        });
+        document.getElementById('nextPage').addEventListener('click', function () {
+            const totalStops = selectedVehicle ?
+                (optimizedRoutes.find(r => r.vehicleId === selectedVehicle)?.stops.filter(s => s.tipo !== 'retorno_base').length || 0) :
+                optimizedRoutes.reduce((s, r) => s + r.stops.filter(s => s.tipo !== 'retorno_base').length, 0);
+            if (currentPage * ITEMS_PER_PAGE < totalStops) { currentPage++; renderResults(); }
+        });
+
+        // --- FUNÇÕES DE DRAG AND DROP ---
+        function dragStart(e, day, vehicleId, stopParada) {
+            draggedStopInfo = { day, vehicleId, stopParada };
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        function dragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const row = e.target.closest('tr.draggable-row');
+            if (row && !row.classList.contains('dragging')) row.classList.add('drag-over-row');
+        }
+        function dragEnter(e) { e.preventDefault(); }
+        function dragLeave(e) {
+            const row = e.target.closest('tr.draggable-row');
+            if (row) row.classList.remove('drag-over-row');
+        }
+        function dragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over-row').forEach(el => el.classList.remove('drag-over-row'));
+        }
+        async function drop(e, day, vehicleId, targetParada) {
+            e.preventDefault();
+            dragEnd(e);
+            
+            if (!draggedStopInfo || draggedStopInfo.day !== day || draggedStopInfo.vehicleId !== vehicleId || draggedStopInfo.stopParada == targetParada) {
+                return; // Ignora soltar em dia/veículo diferente ou na mesma posição
+            }
+            
+            const route = optimizedRoutes.find(r => r.day === day && r.vehicleId === vehicleId);
+            if (!route) return;
+
+            // Encontrar índices
+            const fromIndex = route.stops.findIndex(s => s.parada == draggedStopInfo.stopParada && s.tipo === 'entrega');
+            const toIndex = route.stops.findIndex(s => s.parada == targetParada && s.tipo === 'entrega');
+            
+            if (fromIndex === -1 || toIndex === -1) return;
+
+            // Reordenar array (movendo o item fromIndex para toIndex)
+            const [movedItem] = route.stops.splice(fromIndex, 1);
+            route.stops.splice(toIndex, 0, movedItem);
+
+            showToast('Recalculando rota, aguarde...');
+            
+            // Chamar API para recalcular as distâncias dessa rota
+            await callApiToRecalculate(route);
+            
+            // Recalcular horários em cascata
+            recalculateRouteTimes(route);
+            
+            // Re-renderiza tudo
+            renderResults();
+            updateDashboard(optimizedRoutes, {
+                totalSavings: parseFloat(document.getElementById('totalSavings').textContent.replace('R$ ', '').replace(',','.')) || 0,
+                kmSaved: 0, // mock fallback
+                overtimeHours: 0,
+                totalStops: parseInt(document.getElementById('totalStops').textContent),
+                totalRoutes: parseInt(document.getElementById('totalRoutes').textContent)
+            }); // Reatualiza totais
+            showToast('Rota atualizada!');
+        }
+
+        // --- FUNÇÕES DE EDIÇÃO DE TEMPO (SAÍDA) ---
+        function editDepartureTime(e, day, vehicleId, stopParada) {
+            const td = e.currentTarget;
+            if (td.querySelector('select')) return; // Já está editando
+
+            const route = optimizedRoutes.find(r => r.day === day && r.vehicleId === vehicleId);
+            if (!route) return;
+            const stop = route.stops.find(s => s.parada == stopParada && s.tipo === 'entrega');
+            if (!stop) return;
+
+            const currentDuration = stop.customStopTime || CONFIG.STOP_TIME_MINUTES;
+
+            let optionsHtml = '';
+            // De 10 a 60 min
+            for(let m=10; m<=60; m+=10) {
+                optionsHtml += `<option value="${m}" ${m===currentDuration ? 'selected' : ''}>${m} min</option>`;
+            }
+            // De 90 a 360 min
+            for(let m=90; m<=360; m+=30) {
+                const hours = Math.floor(m/60);
+                const mins = m%60;
+                const label = mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+                optionsHtml += `<option value="${m}" ${m===currentDuration ? 'selected' : ''}>${label}</option>`;
+            }
+
+            td.innerHTML = `<select class="text-xs p-0 m-0 border-primary rounded" onblur="saveDepartureTime(this, ${day}, ${vehicleId}, '${stopParada}')" onchange="saveDepartureTime(this, ${day}, ${vehicleId}, '${stopParada}')">${optionsHtml}</select>`;
+            td.querySelector('select').focus();
+        }
+
+        function saveDepartureTime(selectEl, day, vehicleId, stopParada) {
+            const newDuration = parseInt(selectEl.value);
+            
+            const route = optimizedRoutes.find(r => r.day === day && r.vehicleId === vehicleId);
+            if (!route) return;
+            const stop = route.stops.find(s => s.parada == stopParada && s.tipo === 'entrega');
+            if (!stop) return;
+
+            if (stop.customStopTime !== newDuration) {
+                stop.customStopTime = newDuration;
+                recalculateRouteTimes(route);
+                renderResults();
+                showToast('Horário atualizado!');
+            } else {
+                selectEl.parentElement.innerHTML = formatTime(stop.departure);
+            }
+        }
+
+        function recalculateRouteTimes(route) {
+            let currentTime = CONFIG.DAILY_START_HOUR * 60; // 8h
+
+            route.stops.forEach(stop => {
+                if (stop.tipo === 'retorno_base') return;
+
+                const arrivalTime = currentTime + stop.travelTime;
+                stop.arrival = arrivalTime;
+
+                const duration = stop.customStopTime || CONFIG.STOP_TIME_MINUTES;
+                const departureTime = arrivalTime + duration;
+                stop.departure = departureTime;
+
+                currentTime = departureTime;
+            });
+        }
+
+        async function callApiToRecalculate(route) {
+            const baseCoords = { lat: -23.5015, lon: -47.4526 };
+            let routeTotalKm = 0;
+            let prev = baseCoords;
+
+            route.stops.forEach(s => {
+                if (s.tipo === 'entrega' && s.lat && s.lon) {
+                    const dist = haversine(prev.lat, prev.lon, s.lat, s.lon);
+                    const travelMinutes = Math.round((dist / CONFIG.AVERAGE_SPEED_KMH) * 60);
+                    s.travelTime = travelMinutes;
+                    s.km = parseFloat(dist.toFixed(1));
+                    routeTotalKm += dist;
+                    prev = { lat: s.lat, lon: s.lon };
+                }
+            });
+
+            const returnDist = haversine(prev.lat, prev.lon, baseCoords.lat, baseCoords.lon);
+            routeTotalKm += returnDist;
+            route.totalKm = Math.round(routeTotalKm * 10) / 10;
+
+            const totalKmAllRoutes = optimizedRoutes.reduce((s, r) => s + r.totalKm, 0);
+            const kmReductionEl = document.getElementById('kmReduction');
+            if (kmReductionEl) kmReductionEl.textContent = totalKmAllRoutes.toFixed(1) + ' km';
+        }
+    </script>
+</body>
+</html>
