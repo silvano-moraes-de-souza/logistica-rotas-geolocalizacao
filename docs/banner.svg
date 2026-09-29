@@ -1,16 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="Route Planning + Delivery Tracking">
-<rect width="1280" height="320" fill="#0f1115"/>
-<rect x="64" y="64" width="6" height="192" rx="3" fill="#3987e5"/>
-<text x="96" y="158" fill="#f5f5f3" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="52" font-weight="700">Route Planning + Delivery Tracking</text>
-<text x="96" y="202" fill="#a3a29c" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22">PDF orders to optimized routes, plus an offline-first driver app with QR codes</text>
-<rect x="96" y="226" width="78" height="32" rx="16" fill="#1d2027"/>
-<text x="135.0" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">Python</text>
-<rect x="184" y="226" width="87" height="32" rx="16" fill="#1d2027"/>
-<text x="227.5" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">Node.js</text>
-<rect x="281" y="226" width="168" height="32" rx="16" fill="#1d2027"/>
-<text x="365.0" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">OpenRouteService</text>
-<rect x="459" y="226" width="132" height="32" rx="16" fill="#1d2027"/>
-<text x="525.0" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">React Native</text>
-<rect x="601" y="226" width="78" height="32" rx="16" fill="#1d2027"/>
-<text x="640.0" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">SQLite</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-label="Route Planner: Vehicle routing with time windows and an offline-first driver app">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1016"/><stop offset="1" stop-color="#111a24"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f0883e"/><stop offset="0.45" stop-color="#f5fbff"/>
+      <stop offset="0.55" stop-color="#f5fbff"/><stop offset="1" stop-color="#f0883e"/>
+      <animateTransform attributeName="gradientTransform" type="translate" values="-1 0; 1 0" dur="4.5s" repeatCount="indefinite"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f0883e" stop-opacity="0.30"/><stop offset="1" stop-color="#f0883e" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#1b2430" stroke-width="1"/>
+    </pattern>
+    <style>
+      .sans { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; } .mono { font-family: ui-monospace, 'Cascadia Code', Consolas, 'Liberation Mono', monospace; }
+      .pulse { animation: pulse 3s ease-in-out infinite; transform-origin: 1040px 180px; }
+      @keyframes pulse { 0%, 100% { transform: scale(0.92); opacity: .65; } 50% { transform: scale(1.08); opacity: 1; } }
+      .fade { opacity: 0; animation: fade 8s infinite; }
+      @keyframes fade { 0% { opacity: 0; transform: translateY(8px); } 6% { opacity: 1; transform: none; } 88% { opacity: 1; } 96%, 100% { opacity: 0; } }
+      .grow { transform-box: fill-box; transform-origin: bottom; animation: grow 8s ease-out infinite; }
+      @keyframes grow { 0% { transform: scaleY(0); } 18% { transform: scaleY(1); } 88% { transform: scaleY(1); opacity: 1; } 96%, 100% { transform: scaleY(1); opacity: 0; } }
+      .growx { transform-box: fill-box; transform-origin: left; animation: growx 8s ease-out infinite; }
+      @keyframes growx { 0% { transform: scaleX(0); } 18% { transform: scaleX(1); } 88% { transform: scaleX(1); opacity: 1; } 96%, 100% { transform: scaleX(1); opacity: 0; } }
+      .draw { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 8s ease-in-out infinite; }
+      @keyframes draw { 0% { stroke-dashoffset: 1000; } 35% { stroke-dashoffset: 0; } 88% { stroke-dashoffset: 0; opacity: 1; } 96%, 100% { opacity: 0; } }
+      .flow { stroke-dasharray: 6 8; animation: flow 1.4s linear infinite; }
+      @keyframes flow { to { stroke-dashoffset: -28; } }
+      .blink { animation: blink 1s steps(1) infinite; } @keyframes blink { 50% { opacity: 0; } }
+      .d1 { animation-delay: .3s; } .d2 { animation-delay: .6s; } .d3 { animation-delay: .9s; }
+      .d4 { animation-delay: 1.2s; } .d5 { animation-delay: 1.5s; } .d6 { animation-delay: 1.8s; }
+      .d7 { animation-delay: 2.1s; } .d8 { animation-delay: 2.4s; } .d9 { animation-delay: 2.7s; }
+    </style>
+  </defs>
+  <rect width="1280" height="360" fill="url(#bg)"/>
+  <rect width="1280" height="360" fill="url(#grid)" opacity="0.55"/>
+  <circle class="pulse" cx="1040" cy="180" r="175" fill="url(#glow)"/>
+  <rect x="64" y="64" width="6" height="232" rx="3" fill="#f0883e"/>
+  <text x="96" y="96" class="mono" font-size="16" fill="#f0883e" letter-spacing="2">LOGISTICS · ROUTE PLANNING</text>
+  <text x="92" y="167" class="sans" font-size="88" font-weight="800" fill="url(#shine)">Route Planner</text>
+  <text x="96" y="212" class="sans" font-size="20" fill="#9aa7b2">Vehicle routing with time windows and an offline-first driver</text><text x="96" y="238" class="sans" font-size="20" fill="#9aa7b2">app</text>
+  <rect x="96" y="262" width="71" height="28" rx="14" fill="#161b22" stroke="#f0883e" stroke-opacity="0.45"/><text x="132" y="281" text-anchor="middle" class="mono" font-size="13" fill="#c9d1d9">Python</text><rect x="177" y="262" width="79" height="28" rx="14" fill="#161b22" stroke="#f0883e" stroke-opacity="0.45"/><text x="217" y="281" text-anchor="middle" class="mono" font-size="13" fill="#c9d1d9">Node.js</text><rect x="267" y="262" width="153" height="28" rx="14" fill="#161b22" stroke="#f0883e" stroke-opacity="0.45"/><text x="343" y="281" text-anchor="middle" class="mono" font-size="13" fill="#c9d1d9">OpenRouteService</text><rect x="430" y="262" width="120" height="28" rx="14" fill="#161b22" stroke="#f0883e" stroke-opacity="0.45"/><text x="490" y="281" text-anchor="middle" class="mono" font-size="13" fill="#c9d1d9">React Native</text>
+  <g><rect x="850" y="40" width="380" height="280" rx="16" fill="#0f161f" stroke="#2a3542"/><line x1="870" y1="44" x2="870" y2="316" stroke="#1b2430"/><line x1="910" y1="44" x2="910" y2="316" stroke="#1b2430"/><line x1="950" y1="44" x2="950" y2="316" stroke="#1b2430"/><line x1="990" y1="44" x2="990" y2="316" stroke="#1b2430"/><line x1="1030" y1="44" x2="1030" y2="316" stroke="#1b2430"/><line x1="1070" y1="44" x2="1070" y2="316" stroke="#1b2430"/><line x1="1110" y1="44" x2="1110" y2="316" stroke="#1b2430"/><line x1="1150" y1="44" x2="1150" y2="316" stroke="#1b2430"/><line x1="1190" y1="44" x2="1190" y2="316" stroke="#1b2430"/><line x1="854" y1="60" x2="1226" y2="60" stroke="#1b2430"/><line x1="854" y1="100" x2="1226" y2="100" stroke="#1b2430"/><line x1="854" y1="140" x2="1226" y2="140" stroke="#1b2430"/><line x1="854" y1="180" x2="1226" y2="180" stroke="#1b2430"/><line x1="854" y1="220" x2="1226" y2="220" stroke="#1b2430"/><line x1="854" y1="260" x2="1226" y2="260" stroke="#1b2430"/><line x1="854" y1="300" x2="1226" y2="300" stroke="#1b2430"/><path class="draw" d="M880 270 C900 180 920 130 950 120 S1030 230 1060 210 S1100 80 1130 90 S1200 200 1210 250" fill="none" stroke="#f0883e" stroke-width="4" stroke-linecap="round"/><g class="fade d1"><circle cx="880" cy="270" r="11" fill="#f0883e"/><text x="880" y="274" text-anchor="middle" class="sans" font-size="11" font-weight="800" fill="#0b1016">1</text></g><g class="fade d3"><circle cx="950" cy="120" r="11" fill="#f0883e"/><text x="950" y="124" text-anchor="middle" class="sans" font-size="11" font-weight="800" fill="#0b1016">2</text></g><g class="fade d5"><circle cx="1060" cy="210" r="11" fill="#f0883e"/><text x="1060" y="214" text-anchor="middle" class="sans" font-size="11" font-weight="800" fill="#0b1016">3</text></g><g class="fade d7"><circle cx="1130" cy="90" r="11" fill="#f0883e"/><text x="1130" y="94" text-anchor="middle" class="sans" font-size="11" font-weight="800" fill="#0b1016">4</text></g><g class="fade d9"><circle cx="1210" cy="250" r="11" fill="#f0883e"/><text x="1210" y="254" text-anchor="middle" class="sans" font-size="11" font-weight="800" fill="#0b1016">5</text></g><g><rect x="-12" y="-8" width="24" height="16" rx="4" fill="#f5fbff"/><rect x="4" y="-5" width="7" height="10" rx="2" fill="#f0883e"/><animateMotion dur="8s" repeatCount="indefinite" rotate="auto" path="M880 270 C900 180 920 130 950 120 S1030 230 1060 210 S1100 80 1130 90 S1200 200 1210 250" keyTimes="0;0.4;1" keyPoints="0;1;1" calcMode="linear"/></g><g class="fade d6"><rect x="1080" y="282" width="138" height="28" rx="14" fill="#161f2b" stroke="#f0883e"/><text x="1149" y="301" text-anchor="middle" class="sans" font-size="14" font-weight="800" fill="#f0883e">3h → 2min</text></g></g>
 </svg>
