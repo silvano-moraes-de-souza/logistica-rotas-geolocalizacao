@@ -15,6 +15,15 @@
 
 <sub>The 3 h to 2 min comparison is the author's measurement in daily operation. Addresses and identifiers in this repository are fictitious.</sub>
 
+![Planning time before and after](docs/planning_time.png)
+
+<details>
+<summary>Route planning screen (web module, before an upload)</summary>
+
+![Web module](docs/screenshot-web.png)
+
+</details>
+
 ## Two independent modules
 
 ```mermaid
