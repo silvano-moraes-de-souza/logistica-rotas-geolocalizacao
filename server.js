@@ -56,17 +56,17 @@ app.get('*', (req, res) => {
 });
 
 const server = app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    console.log(`📍 Frontend: http://localhost:${PORT}`);
-    console.log(`🔧 API Process: POST http://localhost:${PORT}/api/process`);
-    console.log(`⚡ API Optimize: POST http://localhost:${PORT}/api/optimize`);
-    console.log(`🔑 ORS API Key: ${process.env.OPENROUTESERVICE_API_KEY ? 'Configurada' : 'NÃO CONFIGURADA'}`);
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`Frontend: http://localhost:${PORT}`);
+    console.log(`API Process: POST http://localhost:${PORT}/api/process`);
+    console.log(`API Optimize: POST http://localhost:${PORT}/api/optimize`);
+    console.log(`ORS API Key: ${process.env.OPENROUTESERVICE_API_KEY ? 'Configurada' : 'NÃO CONFIGURADA'}`);
 });
 
 server.on('error', (e) => {
     if (e.code === 'EADDRINUSE') {
-        console.error(`❌ Erro: A porta ${PORT} já está em uso.`);
-        console.error(`💡 Sugestão: Mate o processo anterior ou use 'PORT=3002 node server.js'`);
+        console.error(`Erro: A porta ${PORT} já está em uso.`);
+        console.error(`Sugestão: Mate o processo anterior ou use 'PORT=3002 node server.js'`);
         process.exit(1);
     }
 });

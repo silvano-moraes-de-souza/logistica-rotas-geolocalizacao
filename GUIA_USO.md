@@ -17,7 +17,7 @@
 
 ```bash
 # Clone ou baixe os arquivos para uma pasta
-cd "C:\Users\LENOVO\Documents\PROJETO Dashboard\LOGISTICA - ROTA"
+cd logistica-rotas-geolocalizacao
 
 # Instale as dependências
 pip install -r requirements.txt
@@ -167,16 +167,16 @@ TESTES DO SISTEMA DE LOGÍSTICA EFÊMERO
 ============================================================
 
 Testando importações...
-  ✅ config.py
-  ✅ services/pdf_extractor.py
-  ✅ services/geocoder.py
-  ✅ services/route_optimizer.py
-  ✅ main.py
-  ✅ supabase_integration.py
+  OK config.py
+  OK services/pdf_extractor.py
+  OK services/geocoder.py
+  OK services/route_optimizer.py
+  OK main.py
+  OK supabase_integration.py
 Todas as importações OK!
 
 ...
-🎉 Todos os testes passaram! Sistema pronto para uso.
+Todos os testes passaram.
 ```
 
 ## Fluxo Completo de Processamento
@@ -215,15 +215,15 @@ Todas as importações OK!
 
 ## Regras de Negócio Implementadas
 
-✅ **Limite de 50 PDFs** por lote  
-✅ **Sem armazenamento** de PDFs (processamento efêmero)  
-✅ **Horário de trabalho**: Seg-Sex, 08:00-16:30  
-✅ **Tempo de retorno**: 30 min para conferência na base (Sorocaba)  
-✅ **Tempo de entrega**: 10 min por parada  
-✅ **Diluição automática**: Excesso vai para próximo dia útil  
-✅ **Feriados brasileiros**: Considerados na diluição  
-✅ **Fins de semana**: Pulados automaticamente  
-✅ **Tratamento de erros**: Endereços não encontrados reportados separadamente  
+- **Limite de 50 PDFs** por lote  
+- **Sem armazenamento** de PDFs (processamento efêmero)  
+- **Horário de trabalho**: Seg-Sex, 08:00-16:30  
+- **Tempo de retorno**: 30 min para conferência na base (Sorocaba)  
+- **Tempo de entrega**: 10 min por parada  
+- **Diluição automática**: Excesso vai para próximo dia útil  
+- **Feriados brasileiros**: Considerados na diluição  
+- **Fins de semana**: Pulados automaticamente  
+- **Tratamento de erros**: Endereços não encontrados reportados separadamente  
 
 ## Troubleshooting
 
@@ -248,11 +248,11 @@ Todas as importações OK!
 
 ## Próximos Passos
 
-1. ✅ Testar com PDFs reais de Notas Fiscais
-2. ✅ Validar precisão da extração de endereços
-3. ✅ Ajustar velocidade média (`Config.VELOCIDADE_MEDIA_KMH`) conforme região
-4. ✅ Monitorar limites da API gratuita do OpenRouteService
-5. ✅ Implementar cache de endereços (se necessário)
+1. Testar com PDFs reais de Notas Fiscais
+2. Validar precisão da extração de endereços
+3. Ajustar velocidade média (`Config.VELOCIDADE_MEDIA_KMH`) conforme região
+4. Monitorar limites da API gratuita do OpenRouteService
+5. Implementar cache de endereços (se necessário)
 
 ---
 

@@ -11,3 +11,8 @@ node_modules/
 /tmp/
 .DS_Store
 *.bat
+
+# agent config, local only
+.claude/
+CLAUDE.md
+AGENTS.md
